@@ -21,12 +21,25 @@ class AppScaffold extends StatelessWidget {
         title: Text(title ?? 'Event Poll'),
         centerTitle: true,
       ),
+      floatingActionButton:
+          context.read<AuthState>().currentUser?.isAdmin == true
+              ? FloatingActionButton(
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/polls/create', (_) => false);
+                  },
+                  child: Icon(Icons.add),
+                  backgroundColor: Color.fromARGB(255, 99, 174, 236),
+                )
+              : null,
       endDrawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              child: Text(context.read<AuthState>().isLoggedIn ? 'Bonjour ${context.read<AuthState>().currentUser?.username}' : 'Bonjour'),
+              child: Text(context.read<AuthState>().isLoggedIn
+                  ? 'Bonjour ${context.read<AuthState>().currentUser?.username}'
+                  : 'Bonjour'),
             ),
             ListTile(
               leading: const Icon(Icons.event),

@@ -1,4 +1,5 @@
 import 'package:event_poll/states/polls_state.dart';
+import 'package:event_poll/ui/add_page.dart';
 import 'package:event_poll/ui/details_page.dart';
 import 'package:event_poll/ui/edit_page.dart';
 import 'package:event_poll/ui/login_page.dart';
@@ -48,7 +49,7 @@ class App extends StatelessWidget {
             ),
         '/polls/create': (context) => const AppScaffold(
               title: 'Ajouter un événement',
-              body: Placeholder(child: Center(child: Text('POLLS_CREATE'))),
+              body: AddPage(child: Center(child: Text('POLLS_CREATE'))),
             ),
         '/polls/detail': (context) {
           final Poll poll = ModalRoute.of(context)!.settings.arguments as Poll;

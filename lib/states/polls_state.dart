@@ -71,4 +71,34 @@ class PollsState extends ChangeNotifier {
       return false;
     }
   }
+
+  Future<Poll?> postPoll(String name, String description, DateTime eventDate) async {
+    DateTime parsedDate = DateTime.parse(eventDate.toString());
+    String outputDate = parsedDate.toUtc().toIso8601String();
+    print(outputDate);
+    final postResponse = await http.post(
+      Uri.parse('${Configs.baseUrl}/polls'),
+      headers: {
+        HttpHeaders.authorizationHeader: 'Bearer $_token',
+        HttpHeaders.contentTypeHeader: 'application/json',
+      },
+      body: json.encode({
+        "name": name,
+        "description": description,
+        "eventDate": outputDate
+      }),
+    );
+    print(postResponse.statusCode);
+
+    if(postResponse.statusCode == HttpStatus.badRequest){
+      print("bad request");
+    }
+
+    if (postResponse.statusCode == HttpStatus.created) {
+      final poll = Poll.fromJson(json.decode(postResponse.body));
+      _polls.add(poll);
+      notifyListeners();
+      return poll;
+    }
+  }
 }
