@@ -6,11 +6,16 @@ import '../models/poll.dart';
 import '../models/user.dart';
 import 'package:http/http.dart' as http;
 
+import '../models/vote.dart';
+
 class PollsState extends ChangeNotifier {
   String? _token;
 
   List<Poll> _polls = [];
   List<Poll> get polls => _polls;
+
+  List<Vote> _votes = [];
+  List<Vote> get votes => _votes;
 
   void setToken(String? token) {
     _token = token;
@@ -99,6 +104,24 @@ class PollsState extends ChangeNotifier {
       _polls.add(poll);
       notifyListeners();
       return poll;
+    }
+  }
+
+  Future<List<Vote>> fetchVotes(int pollId) async {
+    final response = await http.get(
+      Uri.parse('${Configs.baseUrl}/polls/$pollId/votes'),
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+      },
+    );
+    if (response.statusCode == HttpStatus.ok) {
+      _votes = (json.decode(response.body) as List)
+          .map((e) => Vote.fromJson(e))
+          .toList();
+      notifyListeners();
+      return _votes;
+    } else {
+      return [];
     }
   }
 }

@@ -23,71 +23,83 @@ class _PollsPageState extends State<PollsPage> {
       itemCount: polls.length,
       itemBuilder: (context, index) {
         final poll = polls[index];
-        return Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: mq.size.width * 0.05,
-              vertical: mq.size.height * 0.01),
-          child: Card(
-            child: Column(
-              children: [
-                Row(children: [
-                  Expanded(
-                    child: ListTile(
-                      title: Text(poll.name),
-                      subtitle: Text(poll.description),
-                      // leading: poll.imageName != null
-                      //     ? Image.network(
-                      //         'https://event-poll-api.herokuapp.com/images/${poll.imageName}',
-                      //         width: 100,
-                      //         height: 100,
-                      //         fit: BoxFit.cover,
-                      //       )
-                      //     : const SizedBox.shrink(),
-                    ),
-                  ),
-                  Text(DateFormat.yMMMMd('fr_FR').format(poll.eventDate)),
-                  const SizedBox(width: 8),
-                ]),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/polls/detail',
-                            arguments: poll);
-                      },
-                      child: const Text('Voir'),
-                    ),
-                    const SizedBox(width: 8),
-                    context.read<AuthState>().currentUser?.isAdmin == true
-                        ? Row(children: [
+        return MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, '/polls/detail',
+                      arguments: poll);
+                },
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: mq.size.width * 0.05,
+                      vertical: mq.size.height * 0.01),
+                  child: Card(
+                    child: Column(
+                      children: [
+                        Row(children: [
+                          Expanded(
+                            child: ListTile(
+                              title: Text(poll.name),
+                              subtitle: Text(poll.description),
+                              // leading: poll.imageName != null
+                              //     ? Image.network(
+                              //         'https://event-poll-api.herokuapp.com/images/${poll.imageName}',
+                              //         width: 100,
+                              //         height: 100,
+                              //         fit: BoxFit.cover,
+                              //       )
+                              //     : const SizedBox.shrink(),
+                            ),
+                          ),
+                          Text(DateFormat.yMMMMd('fr_FR')
+                              .format(poll.eventDate)),
+                          const SizedBox(width: 8),
+                        ]),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
                             TextButton(
                               onPressed: () {
-                                Navigator.pushNamed(context, '/polls/update',
+                                Navigator.pushNamed(context, '/polls/detail',
                                     arguments: poll);
                               },
-                              child: const Text('Modifier'),
+                              child: const Text('Voir'),
                             ),
                             const SizedBox(width: 8),
-                            TextButton.icon(
-                              onPressed: () {
-                                context.read<PollsState>().deletePoll(poll);
-                              },
-                              icon: Icon(
-                                Icons.delete,
-                                size: 24.0,
-                              ),
-                              label: Text('Supprimer'),
-                            ),
-                          ])
-                        : const SizedBox.shrink(),
-                    const SizedBox(width: 8),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
+                            context.read<AuthState>().currentUser?.isAdmin ==
+                                    true
+                                ? Row(children: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                            context, '/polls/update',
+                                            arguments: poll);
+                                      },
+                                      child: const Text('Modifier'),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    TextButton.icon(
+                                      onPressed: () {
+                                        context
+                                            .read<PollsState>()
+                                            .deletePoll(poll);
+                                      },
+                                      icon: Icon(
+                                        Icons.delete,
+                                        size: 24.0,
+                                      ),
+                                      label: Text('Supprimer'),
+                                    ),
+                                  ])
+                                : const SizedBox.shrink(),
+                            const SizedBox(width: 8),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                )));
       },
     );
   }
