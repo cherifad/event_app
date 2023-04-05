@@ -82,14 +82,17 @@ class _DetailsPageState extends State<DetailsPage> {
                     color: vote.status ? Colors.green : Colors.red,
                   ),
                   ToggleButtons(
-                    children: [
+                    isSelected: [vote.status, !vote.status],
+                    onPressed: (int index) async {
+                      await context
+                          .read<PollsState>()
+                          .postVote(widget.poll.id, index == 0);
+                      context.read<PollsState>().fetchVotes(widget.poll.id);
+                    },
+                    children: const [
                       Icon(Icons.check, color: Colors.green),
                       Icon(Icons.close, color: Colors.red),
                     ],
-                    isSelected: [vote.status, !vote.status],
-                    onPressed: (int index) {
-                      vote.status = index == 0;
-                    },
                   ),
                 ],
               );

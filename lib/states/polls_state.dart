@@ -77,7 +77,8 @@ class PollsState extends ChangeNotifier {
     }
   }
 
-  Future<Poll?> postPoll(String name, String description, DateTime eventDate) async {
+  Future<Poll?> postPoll(
+      String name, String description, DateTime eventDate) async {
     DateTime parsedDate = DateTime.parse(eventDate.toString());
     String outputDate = parsedDate.toUtc().toIso8601String();
     print(outputDate);
@@ -87,15 +88,12 @@ class PollsState extends ChangeNotifier {
         HttpHeaders.authorizationHeader: 'Bearer $_token',
         HttpHeaders.contentTypeHeader: 'application/json',
       },
-      body: json.encode({
-        "name": name,
-        "description": description,
-        "eventDate": outputDate
-      }),
+      body: json.encode(
+          {"name": name, "description": description, "eventDate": outputDate}),
     );
     print(postResponse.statusCode);
 
-    if(postResponse.statusCode == HttpStatus.badRequest){
+    if (postResponse.statusCode == HttpStatus.badRequest) {
       print("bad request");
     }
 
@@ -122,6 +120,25 @@ class PollsState extends ChangeNotifier {
       return _votes;
     } else {
       return [];
+    }
+  }
+
+  Future<Poll?> postVote(int pollId, bool value) async {
+    final response = await http.post(
+      Uri.parse('${Configs.baseUrl}/polls/$pollId/votes'),
+      headers: {
+        HttpHeaders.authorizationHeader: 'Bearer $_token',
+      },
+      body: {
+        "status": value.toString(),
+      }
+    );
+
+    if (response.statusCode == HttpStatus.created) {
+      notifyListeners();
+      return jsonEncode(response.body) as Poll;      
+    } else {
+      return null;
     }
   }
 }
