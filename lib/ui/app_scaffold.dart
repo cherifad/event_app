@@ -49,31 +49,37 @@ class AppScaffold extends StatelessWidget {
                     context, '/polls', (_) => false);
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.login),
-              title: const Text('Connexion'),
-              onTap: () {
-                Navigator.pushNamedAndRemoveUntil(
-                    context, '/login', (_) => false);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.save_alt),
-              title: const Text('Inscription'),
-              onTap: () {
-                Navigator.pushNamedAndRemoveUntil(
-                    context, '/signup', (_) => false);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Déconnexion'),
-              onTap: () {
-                context.read<AuthState>().logout();
-                Navigator.pushNamedAndRemoveUntil(
-                    context, '/login', (_) => false);
-              },
-            ),
+            context.read<AuthState>().isLoggedIn == false
+                ? ListTile(
+                    leading: const Icon(Icons.login),
+                    title: const Text('Connexion'),
+                    onTap: () {
+                      Navigator.pushNamedAndRemoveUntil(
+                          context, '/login', (_) => false);
+                    },
+                  )
+                : const SizedBox(),
+            context.read<AuthState>().isLoggedIn == false
+                ? ListTile(
+                    leading: const Icon(Icons.save_alt),
+                    title: const Text('Inscription'),
+                    onTap: () {
+                      Navigator.pushNamedAndRemoveUntil(
+                          context, '/signup', (_) => false);
+                    },
+                  )
+                : const SizedBox(),
+            context.read<AuthState>().isLoggedIn == true
+                ? ListTile(
+                    leading: const Icon(Icons.logout),
+                    title: const Text('Déconnexion'),
+                    onTap: () {
+                      context.read<AuthState>().logout();
+                      Navigator.pushNamedAndRemoveUntil(
+                          context, '/login', (_) => false);
+                    },
+                  )
+                : const SizedBox(),
           ],
         ),
       ),
