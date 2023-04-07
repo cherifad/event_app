@@ -77,8 +77,8 @@ class PollsState extends ChangeNotifier {
     }
   }
 
-  Future<Poll?> postPoll(
-      String name, String description, DateTime eventDate) async {
+  Future<Poll?> postPoll(String? image, String name, String description,
+      DateTime eventDate) async {
     DateTime parsedDate = DateTime.parse(eventDate.toString());
     String outputDate = parsedDate.toUtc().toIso8601String();
     print(outputDate);
@@ -91,7 +91,6 @@ class PollsState extends ChangeNotifier {
       body: json.encode(
           {"name": name, "description": description, "eventDate": outputDate}),
     );
-    print(postResponse.statusCode);
 
     if (postResponse.statusCode == HttpStatus.badRequest) {
       print("bad request");
@@ -99,6 +98,20 @@ class PollsState extends ChangeNotifier {
 
     if (postResponse.statusCode == HttpStatus.created) {
       final poll = Poll.fromJson(json.decode(postResponse.body));
+
+      // post image
+      final postImage = await http.MultipartRequest(
+        'POST',
+        Uri.parse('${Configs.baseUrl}/polls/${poll.id}/image'),        
+      );
+      postImage.files.add(
+        await http.MultipartFile.fromPath('${name}_image', image!)
+      );
+      postImage.headers['authorization'] = 'Bearer $_token';
+      var res = await postImage.send();
+
+      print(res.headers);
+
       _polls.add(poll);
       notifyListeners();
       return poll;
@@ -124,19 +137,16 @@ class PollsState extends ChangeNotifier {
   }
 
   Future<Poll?> postVote(int pollId, bool value) async {
-    final response = await http.post(
-      Uri.parse('${Configs.baseUrl}/polls/$pollId/votes'),
-      headers: {
-        HttpHeaders.authorizationHeader: 'Bearer $_token',
-      },
-      body: {
-        "status": value.toString(),
-      }
-    );
+    final response = await http
+        .post(Uri.parse('${Configs.baseUrl}/polls/$pollId/votes'), headers: {
+      HttpHeaders.authorizationHeader: 'Bearer $_token',
+    }, body: {
+      "status": value.toString(),
+    });
 
     if (response.statusCode == HttpStatus.created) {
       notifyListeners();
-      return jsonEncode(response.body) as Poll;      
+      return jsonEncode(response.body) as Poll;
     } else {
       return null;
     }

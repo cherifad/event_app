@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/basic.dart';
@@ -5,6 +7,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../configs.dart';
 import '../models/poll.dart';
 import '../models/vote.dart';
 import '../states/polls_state.dart';
@@ -29,6 +32,7 @@ class _DetailsPageState extends State<DetailsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+          widget.poll.imageName != null ? Image.network('${Configs.baseUrl}/images/${widget.poll.imageName!}', width: 400) : const SizedBox(),
           Center(
             child: Text(
               widget.poll.name,

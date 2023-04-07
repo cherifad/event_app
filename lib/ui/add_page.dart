@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:event_poll/states/polls_state.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,8 @@ import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/poll.dart';
+import 'package:file_picker/file_picker.dart';
+
 
 class AddPage extends StatefulWidget {
   const AddPage({super.key, required Center child});
@@ -17,6 +21,7 @@ class _AddPageState extends State<AddPage> {
   String? _validateRequired(String? value) {
     return value == null || value.isEmpty ? 'Ce champ est obligatoire.' : null;
   }
+  String _fileText="";
 
   late TextEditingController _dateController = TextEditingController(
       text: DateFormat('dd/MM/yyyy').format(DateTime.now()));
@@ -58,12 +63,27 @@ class _AddPageState extends State<AddPage> {
 
   void _submit() async {
     final pollParam = await context.read<PollsState>().postPoll(
+        _fileText,
         _textNameController.text,
         _textDescriptionController.text,
         _selectedDateTime);
 
     if (pollParam != null && mounted) {
       Navigator.of(context).pushReplacementNamed('/polls/detail', arguments: pollParam);
+    }
+  }
+
+  void _pickFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowedExtensions: ['jpg','png'],
+      allowMultiple: false,
+    );
+
+    if(result != null && result.files.single.path != null){
+      File _file = File(result.files.single.path!);
+      setState(() {
+        _fileText = _file.path;
+      });
     }
   }
 
@@ -76,6 +96,7 @@ class _AddPageState extends State<AddPage> {
             horizontal: mq.size.width * 0.05, vertical: mq.size.height * 0.01),
         child: Column(
           children: [
+            _fileText.length > 0 ? Image.file(new File(_fileText), width: 400) : const SizedBox(),
             TextFormField(
               controller: _textNameController,
               decoration: const InputDecoration(labelText: 'Nom'),
@@ -110,6 +131,7 @@ class _AddPageState extends State<AddPage> {
               },
               child: const Text('Enregistrer'),
             ),
+            ElevatedButton(onPressed: _pickFile, child: Text('Ajouter une image de fond') ),
           ],
         ));
   }
