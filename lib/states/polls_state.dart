@@ -102,11 +102,10 @@ class PollsState extends ChangeNotifier {
       // post image
       final postImage = await http.MultipartRequest(
         'POST',
-        Uri.parse('${Configs.baseUrl}/polls/${poll.id}/image'),        
+        Uri.parse('${Configs.baseUrl}/polls/${poll.id}/image'),
       );
-      postImage.files.add(
-        await http.MultipartFile.fromPath('${name}_image', image!)
-      );
+      postImage.files
+          .add(await http.MultipartFile.fromPath('${name}_image', image!));
       postImage.headers['authorization'] = 'Bearer $_token';
       var res = await postImage.send();
 
@@ -136,17 +135,20 @@ class PollsState extends ChangeNotifier {
     }
   }
 
-  Future<Poll?> postVote(int pollId, bool value) async {
-    final response = await http
-        .post(Uri.parse('${Configs.baseUrl}/polls/$pollId/votes'), headers: {
-      HttpHeaders.authorizationHeader: 'Bearer $_token',
-    }, body: {
-      "status": value.toString(),
-    });
+  Future<Vote?> postVote(int pollId, bool value) async {
+    final response =
+        await http.post(Uri.parse('${Configs.baseUrl}/polls/$pollId/votes'),
+            headers: {
+              HttpHeaders.authorizationHeader: 'Bearer $_token',
+              HttpHeaders.contentTypeHeader: 'application/json',
+            },
+            body: json.encode({
+              "status": value,
+            }));
 
     if (response.statusCode == HttpStatus.created) {
       notifyListeners();
-      return jsonEncode(response.body) as Poll;
+      return Vote.fromJson(json.decode(response.body));
     } else {
       return null;
     }
